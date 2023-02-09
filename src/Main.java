@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
 public class Main {
-    public static boolean check_move(String movestring) {
+    public static boolean Correct_input(String movestring) {
         boolean [] check = new boolean[4];
 
         check[0] = Character.isDigit(movestring.charAt(0));
@@ -34,7 +34,6 @@ public class Main {
 
         return result;
     }
-
     public static String check_result_game(char[][] matrix, char player) {
         String result = "Nothing";
 
@@ -78,7 +77,6 @@ public class Main {
 
         return result;
     }
-
     public static boolean Player_game(char[][] matrix, char player) {
         int index_i = -1, index_j = -1;
         String movestring = "";
@@ -88,7 +86,7 @@ public class Main {
             Scanner sc = new Scanner(System.in);
             movestring = sc.nextLine().toUpperCase();
 
-            if (check_move(movestring)) {
+            if (Correct_input(movestring)) {
                 index_i = Integer.parseInt(String.valueOf(movestring.charAt(0))) - 1;
                 index_j = Integer.parseInt(String.valueOf(movestring.charAt(2))) - 1;
                 if (!occupied(index_i, index_j, matrix)) {
@@ -115,7 +113,35 @@ public class Main {
         return end_game;
     }
 
-    public static void main(String[] args) {
+    public static int[] Intelligence(char[][] matrix, char player) {
+        int [] result_indexes = {-1,-1};
+        //...
+        return result_indexes;
+    }
+    public static boolean Bot_game(char[][] matrix, char player) {
+
+        int [] indexes = Intelligence(matrix, player);
+        System.out.print("Player "+player+": "+indexes[0]+","+indexes[1]);
+
+        matrix[indexes[0]][indexes[1]] = player;
+
+        String result_game = check_result_game(matrix,player);
+        boolean end_game = false;
+
+        if (result_game.equals("Win")) {
+            System.out.println("Player "+player+" win!");
+            end_game = true;
+        }
+        if (result_game.equals("Draw")) {
+            System.out.println("Draw");
+            end_game = true;
+        }
+
+        return end_game;
+    }
+
+
+    public static void Man_vs_Man() {
         char player1 = 'X', player2 = 'O';
 
         char [][] matrix = new char[3][3];
@@ -128,5 +154,23 @@ public class Main {
             end_game = Player_game(matrix,player2);
             if (end_game) break;
         }
+    }
+    public static void Man_vs_Bot() {
+        char player1 = 'X', player2 = 'O';
+
+        char [][] matrix = new char[3][3];
+        boolean end_game;
+
+        while (true) {
+            end_game = Player_game(matrix,player1);
+            if (end_game) break;
+
+            end_game = Bot_game(matrix,player2);
+            if (end_game) break;
+        }
+    }
+
+    public static void main(String[] args) {
+        Man_vs_Bot();
     }
 }
