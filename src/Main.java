@@ -1,6 +1,16 @@
 import java.util.Scanner;
 
 public class Main {
+
+    public static void output_field(char[][] matrix) {
+        for (int i=0; i<3; i++) {
+            for (int j = 0; j < 3; j++)
+                System.out.print(matrix[i][j] + " ");
+            System.out.println();
+        }
+        System.out.println();
+    }
+
     public static boolean Correct_input(String movestring) {
         boolean [] check = new boolean[4];
 
@@ -26,7 +36,6 @@ public class Main {
 
         return result;
     }
-
     public static boolean occupied(int i, int j, char[][] matrix) {
         boolean result = matrix[i][j]!=Character.MIN_VALUE;
 
@@ -65,7 +74,7 @@ public class Main {
             boolean draw = true;
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++)
-                    if (matrix[i][j] == Character.MIN_VALUE) {
+                    if (matrix[i][j] == ' ') { //
                         draw = false;
                         break;
                     }
@@ -115,11 +124,20 @@ public class Main {
 
     public static int[] Intelligence(char[][] matrix, char player) {
         int [] result_indexes = {-1,-1};
-        //...
+        Node.player_bot = player;
+        Node tree = new Node(matrix, player, 0);
         return result_indexes;
     }
-    public static boolean Bot_game(char[][] matrix, char player) {
+/*
+    public static char get_alternative_player(char player) {
+        if (player == 'X')
+            return 'O';
+        else
+            return 'X';
+    }*/
 
+    public static boolean Bot_game(char[][] matrix, char player) {
+        //char opponent = get_alternative_player(player);
         int [] indexes = Intelligence(matrix, player);
         System.out.print("Player "+player+": "+indexes[0]+","+indexes[1]);
 
@@ -139,7 +157,6 @@ public class Main {
 
         return end_game;
     }
-
 
     public static void Man_vs_Man() {
         char player1 = 'X', player2 = 'O';
@@ -171,6 +188,14 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        Man_vs_Bot();
+        //Man_vs_Bot();
+        // char a = ''; это Character.MIN_VALUE
+
+        char [][] matrix = {{'X','O',' '},
+                            {' ',' ','X'},
+                            {'X','O','X'}};
+
+        Intelligence(matrix, 'O');
+
     }
 }
