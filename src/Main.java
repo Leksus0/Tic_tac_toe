@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
@@ -5,7 +6,11 @@ public class Main {
     public static void output_field(char[][] matrix) {
         for (int i=0; i<3; i++) {
             for (int j = 0; j < 3; j++)
-                System.out.print(matrix[i][j] + " ");
+                if (matrix[i][j] != ' ')
+                    System.out.print(matrix[i][j] + " ");
+                else
+                    System.out.print("- ");
+
             System.out.println();
         }
         System.out.println();
@@ -37,7 +42,8 @@ public class Main {
         return result;
     }
     public static boolean occupied(int i, int j, char[][] matrix) {
-        boolean result = matrix[i][j]!=Character.MIN_VALUE;
+        //boolean result = matrix[i][j]!=Character.MIN_VALUE;
+        boolean result = matrix[i][j]!=' ';
 
         if (result) System.out.println("The position is occupied.\n");
 
@@ -122,13 +128,96 @@ public class Main {
         return end_game;
     }
 
+    /*
+    public static boolean not_yet(int j, ArrayList<Integer> have_already_been) {
+        for (Integer el: have_already_been)
+            if (el == j) return false;
+
+        return true;
+    }
+
+
+    public static ArrayList<Node> sort_by_depth(ArrayList<Node> nodes) {
+        ArrayList<Node> result_nodes = new ArrayList<>();
+
+        ArrayList<Integer> have_already_been = new ArrayList<>();
+        for (int i=0; i<nodes.size(); i++) {
+            int imin = 0, min = -1;
+
+            for (int j=0; j<nodes.size(); j++)
+                if (min > nodes.get(j).nearest_resulting_depth && not_yet(j,have_already_been)) {
+                    min = nodes.get(j).nearest_resulting_depth;
+                    imin = j;
+                }
+
+            result_nodes.add(nodes.get(imin));
+            have_already_been.add(imin);
+        }
+
+        return result_nodes;
+    }
+    */
+
+    public static Node get_max_by_score(ArrayList<Node> nodes) {
+        int imax = 0;
+        double max = -1;
+
+        for (int j=0; j<nodes.size(); j++)
+            if (max < nodes.get(j).score) {
+                max = nodes.get(j).score;
+                imax = j;
+            }
+
+        return nodes.get(imax);
+    }
+
     public static int[] Intelligence(char[][] matrix, char player) {
         int [] result_indexes = {-1,-1};
         Node.player_bot = player;
+        Node.count = 0;
         Node tree = new Node(matrix, player, 0);
+
+        /*
+        ArrayList<Node> win_nodes = new ArrayList<>();
+        ArrayList<Node> draw_nodes = new ArrayList<>();
+        ArrayList<Node> loss_nodes = new ArrayList<>();
+        for (Node el: tree.nexts) {
+            if (el.situation.equals("Win")) win_nodes.add(el);
+            if (el.situation.equals("Draw")) draw_nodes.add(el);
+            if (el.situation.equals("Loss")) loss_nodes.add(el);
+        }
+
+        Coordinate result;
+
+        if (win_nodes.size()!=0) {
+            Node minimum_by_depth_win_node = get_min_by_depth(win_nodes);
+            result = minimum_by_depth_win_node.current_move;
+        }
+        else
+        if (draw_nodes.size()!=0) {
+            Node minimum_by_depth_draw_node = get_min_by_depth(draw_nodes);
+            result = minimum_by_depth_draw_node.current_move;
+        }
+        else {
+            Node minimum_by_depth_loss_node = get_min_by_depth(loss_nodes); //мб лучше чтобы бот дольше сопротивлялся при проигрывании?
+            result = minimum_by_depth_loss_node.current_move;
+        }
+
+        result_indexes[0] = result.i;
+        result_indexes[1] = result.j;
+*/
+
+        Node maximum_score_node = get_max_by_score(tree.nexts); //мб лучше чтобы бот дольше сопротивлялся при проигрывании?
+        Coordinate result = maximum_score_node.current_move;
+
+        result_indexes[0] = result.i;
+        result_indexes[1] = result.j;
+
+
         return result_indexes;
     }
-/*
+
+    /*
     public static char get_alternative_player(char player) {
         if (player == 'X')
             return 'O';
@@ -139,7 +228,7 @@ public class Main {
     public static boolean Bot_game(char[][] matrix, char player) {
         //char opponent = get_alternative_player(player);
         int [] indexes = Intelligence(matrix, player);
-        System.out.print("Player "+player+": "+indexes[0]+","+indexes[1]);
+        System.out.println("Player bot "+player+": "+(indexes[0]+1)+","+(indexes[1]+1));
 
         matrix[indexes[0]][indexes[1]] = player;
 
@@ -147,7 +236,7 @@ public class Main {
         boolean end_game = false;
 
         if (result_game.equals("Win")) {
-            System.out.println("Player "+player+" win!");
+            System.out.println("You lose");
             end_game = true;
         }
         if (result_game.equals("Draw")) {
@@ -175,27 +264,73 @@ public class Main {
     public static void Man_vs_Bot() {
         char player1 = 'X', player2 = 'O';
 
-        char [][] matrix = new char[3][3];
+        //char [][] matrix = new char[3][3];
+        char [][] matrix = {{' ',' ',' '},
+                            {' ',' ',' '},
+                            {' ',' ',' '}};
         boolean end_game;
 
         while (true) {
+            output_field(matrix);
+
             end_game = Player_game(matrix,player1);
             if (end_game) break;
+
+            output_field(matrix);
 
             end_game = Bot_game(matrix,player2);
             if (end_game) break;
         }
+
+        output_field(matrix);
+    }
+
+    public static void Bot_vs_Man() {
+        char player1 = 'X', player2 = 'O';
+
+        //char [][] matrix = new char[3][3];
+        char [][] matrix = {{' ',' ',' '},
+                {' ',' ',' '},
+                {' ',' ',' '}};
+        boolean end_game;
+
+        while (true) {
+            output_field(matrix);
+
+            end_game = Bot_game(matrix,player1);
+            if (end_game) break;
+
+            output_field(matrix);
+
+            end_game = Player_game(matrix,player2);
+            if (end_game) break;
+        }
+
+        output_field(matrix);
+    }
+
+
+    public static void Test() {
+        char [][] matrix = {{'X','O','X'},
+                            {'X',' ',' '},
+                            {' ','O',' '}};
+
+
+                Intelligence(matrix, 'O');
     }
 
     public static void main(String[] args) {
-        //Man_vs_Bot();
+        System.out.print("x or o : ");
+        Scanner sc = new Scanner(System.in);
+
+        if (sc.nextLine().charAt(0) == 'x')
+            Man_vs_Bot();
+        else
+            Bot_vs_Man();
+
         // char a = ''; это Character.MIN_VALUE
 
-        char [][] matrix = {{'X','O',' '},
-                            {' ',' ','X'},
-                            {'X','O','X'}};
-
-        Intelligence(matrix, 'O');
+        //Test();
 
     }
 }
